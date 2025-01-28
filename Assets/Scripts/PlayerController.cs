@@ -3,27 +3,33 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 3.0f;
-    public float initialJumpForce = 8.0f;
-    public float maxJumpForce = 15.0f;
-    public float jumpChargeRate = 5f;
-    public float fallGravityMultiplier = 2f;
-    public float jumpReleaseGravityMultiplier = 3f;
+    // Movement
+    public float speed = 8f;
+    public float airControl = 0.8f;
+
+    // Jump System
+    public float initialJumpForce = 12f;
+    public float maxJumpHoldTime = 0.3f;
+    public float holdJumpForce = 5f;
+    public float fallGravity = 2.5f;
+    public float releaseGravity = 4f;
+    public float lowJumpGravity = 3f;
+
     public InputAction MoveAction;
     public InputAction JumpAction;
-    
+
     private Rigidbody2D rb;
-    private bool isGrounded;
+    public bool isGrounded;
     private bool isJumping;
-    private float defaultGravityScale;
-    private float currentJumpForce;
+    private float jumpTimeCounter;
+    private float defaultGravity;
 
     void Start()
     {
         MoveAction.Enable();
         JumpAction.Enable();
         rb = GetComponent<Rigidbody2D>();
-        defaultGravityScale = rb.gravityScale;
+        defaultGravity = rb.gravityScale;
     }
 
     void Update()
@@ -35,8 +41,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
-        Vector2 move = MoveAction.ReadValue<Vector2>();
-        rb.linearVelocity = new Vector2(move.x * speed, rb.linearVelocityY);
+        float moveInput = MoveAction.ReadValue<Vector2>().x;
+        float currentSpeed = isGrounded ? speed : speed * airControl;
+        rb.linearVelocityX = moveInput * currentSpeed;
     }
 
     void HandleJump()
@@ -44,41 +51,54 @@ public class PlayerController : MonoBehaviour
         float jumpInput = JumpAction.ReadValue<float>();
 
         // Start jump
-        if (jumpInput > 0.1f && isGrounded && !isJumping)
+        if (jumpInput > 0.1f && isGrounded)
         {
             isJumping = true;
-            currentJumpForce = initialJumpForce;
-            rb.linearVelocity = new Vector2(rb.linearVelocityX, currentJumpForce);
+            jumpTimeCounter = maxJumpHoldTime;
+            rb.linearVelocityY = initialJumpForce;
         }
 
-        // Charging jump while button held
+        // Sustained jump force while button held
         if (isJumping && jumpInput > 0.1f)
         {
-            if (currentJumpForce < maxJumpForce)
+            if (jumpTimeCounter > 0)
             {
-                currentJumpForce += jumpChargeRate * Time.deltaTime;
-                rb.linearVelocity = new Vector2(rb.linearVelocityX, currentJumpForce);
+                rb.linearVelocityY += holdJumpForce * Time.deltaTime;
+                jumpTimeCounter -= Time.deltaTime;
+            }
+            else
+            {
+                isJumping = false;
             }
         }
 
-        // Release jump button
-        if (jumpInput < 0.1f && isJumping)
+        // Early release cut-off
+        if (jumpInput < 0.1f)
         {
             isJumping = false;
-            rb.gravityScale = jumpReleaseGravityMultiplier;
         }
     }
 
     void HandleGravity()
     {
-        // Increase gravity when falling
+        // Increased gravity when falling
         if (rb.linearVelocityY < 0)
         {
-            rb.gravityScale = fallGravityMultiplier;
+            rb.gravityScale = fallGravity;
         }
+        // Reduced gravity at jump peak
+        else if (rb.linearVelocityY > 0 && !isJumping)
+        {
+            rb.gravityScale = lowJumpGravity;
+        }
+        // Immediate gravity on release
         else if (!isJumping && rb.linearVelocityY > 0)
         {
-            rb.gravityScale = defaultGravityScale;
+            rb.gravityScale = releaseGravity;
+        }
+        else
+        {
+            rb.gravityScale = defaultGravity;
         }
     }
 
@@ -87,7 +107,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
-            rb.gravityScale = defaultGravityScale;
+            rb.gravityScale = defaultGravity;
         }
     }
 
