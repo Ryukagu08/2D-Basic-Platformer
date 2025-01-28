@@ -3,56 +3,99 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    
     public float speed = 3.0f;
-    public float jumpForce = 10.0f;
-    public float maxJumpTime = 0.5f;
+    public float initialJumpForce = 8.0f;
+    public float maxJumpForce = 15.0f;
+    public float jumpChargeRate = 5f;
+    public float fallGravityMultiplier = 2f;
+    public float jumpReleaseGravityMultiplier = 3f;
     public InputAction MoveAction;
     public InputAction JumpAction;
-    private bool isGrounded;
+    
     private Rigidbody2D rb;
-    private float jumpTime;
+    private bool isGrounded;
+    private bool isJumping;
+    private float defaultGravityScale;
+    private float currentJumpForce;
 
-    void Start() {
+    void Start()
+    {
         MoveAction.Enable();
         JumpAction.Enable();
         rb = GetComponent<Rigidbody2D>();
+        defaultGravityScale = rb.gravityScale;
     }
 
-    void Update() {
+    void Update()
+    {
+        HandleMovement();
+        HandleJump();
+        HandleGravity();
+    }
 
-        Vector2 move = MoveAction.ReadValue<Vector2>(); // Movement
-        Vector2 position = (Vector2)transform.position + speed * Time.deltaTime * move;
-        transform.position = position;
+    void HandleMovement()
+    {
+        Vector2 move = MoveAction.ReadValue<Vector2>();
+        rb.linearVelocity = new Vector2(move.x * speed, rb.linearVelocityY);
+    }
 
-        float jumpInput = JumpAction.ReadValue<float>(); // Jump
+    void HandleJump()
+    {
+        float jumpInput = JumpAction.ReadValue<float>();
 
-        if (jumpInput > 0.01f && isGrounded) {
-            jumpTime += Time.deltaTime; // Increase Jump while pressed
-        } else {
-            jumpTime = 0f; // Reset Jump when released
+        // Start jump
+        if (jumpInput > 0.1f && isGrounded && !isJumping)
+        {
+            isJumping = true;
+            currentJumpForce = initialJumpForce;
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, currentJumpForce);
         }
 
-        if (jumpTime > 0 && isGrounded) {
-            float currentJumpForce = Mathf.Lerp(0, jumpForce, jumpTime / maxJumpTime); // Greadual increase
-            rb.linearVelocity = new Vector2 (rb.linearVelocityX, currentJumpForce); // Apply jump force
-        } else if (jumpInput == 0f && rb.linearVelocityY > 0f) {
-            rb.linearVelocity = new Vector2(rb.linearVelocityX, rb.linearVelocityY * 0.9f); // Smooth decrease
+        // Charging jump while button held
+        if (isJumping && jumpInput > 0.1f)
+        {
+            if (currentJumpForce < maxJumpForce)
+            {
+                currentJumpForce += jumpChargeRate * Time.deltaTime;
+                rb.linearVelocity = new Vector2(rb.linearVelocityX, currentJumpForce);
+            }
+        }
+
+        // Release jump button
+        if (jumpInput < 0.1f && isJumping)
+        {
+            isJumping = false;
+            rb.gravityScale = jumpReleaseGravityMultiplier;
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("Ground")) {
+    void HandleGravity()
+    {
+        // Increase gravity when falling
+        if (rb.linearVelocityY < 0)
+        {
+            rb.gravityScale = fallGravityMultiplier;
+        }
+        else if (!isJumping && rb.linearVelocityY > 0)
+        {
+            rb.gravityScale = defaultGravityScale;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
             isGrounded = true;
-            jumpTime = 0f;
+            rb.gravityScale = defaultGravityScale;
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("Ground")) {
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
             isGrounded = false;
         }
     }
-
-
 }

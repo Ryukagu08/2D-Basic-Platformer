@@ -210,12 +210,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  jumpForce: 10
-  maxJumpTime: 10
+  initialJumpForce: 3
+  maxJumpForce: 4
+  jumpChargeRate: 3
+  fallGravityMultiplier: 2
+  jumpReleaseGravityMultiplier: 3
   MoveAction:
     m_Name: Move
     m_Type: 0
-    m_ExpectedControlType: Button
+    m_ExpectedControlType: 
     m_Id: 2bb4b2d2-76e7-455e-b008-cd8f0822e874
     m_Processors: 
     m_Interactions: 
