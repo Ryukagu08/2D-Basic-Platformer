@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     // Movement
     public float speed = 8f;
     public float airControl = 0.8f;
+    private float horizontalinput;
 
     // Jump System
     public float initialJumpForce = 12f;
@@ -24,6 +25,10 @@ public class PlayerController : MonoBehaviour
     private float jumpTimeCounter;
     private float defaultGravity;
 
+    // Ledge Handler
+    public bool IsGrounded => isGrounded;
+    public bool IsFacingRight { get; private set; } = true;
+
     void Start()
     {
         MoveAction.Enable();
@@ -37,6 +42,7 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleGravity();
+        UpdateFacingDirection();
     }
 
     void HandleMovement()
@@ -118,4 +124,11 @@ public class PlayerController : MonoBehaviour
             isGrounded = false;
         }
     }
+
+    void UpdateFacingDirection() // Ledge Handler
+    {
+        if (horizontalinput > 0) IsFacingRight = true;
+        if (horizontalinput < 0) IsFacingRight = false;
+    }
+
 }

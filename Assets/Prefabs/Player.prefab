@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1882729014359788026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7265524005033404970}
+  m_Layer: 0
+  m_Name: LedgeCheckOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7265524005033404970
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882729014359788026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7789979125672959843}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4701249800651638873
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,6 +44,7 @@ GameObject:
   - component: {fileID: 3111964998715824392}
   - component: {fileID: 878735311265153547}
   - component: {fileID: 7512776939292177758}
+  - component: {fileID: 8868806644359803046}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -32,7 +64,8 @@ Transform:
   m_LocalPosition: {x: -3.3, y: -2.13, z: 0.018111821}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7265524005033404970}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5904512670302217690
@@ -132,8 +165,8 @@ MonoBehaviour:
   speed: 3
   airControl: 1
   initialJumpForce: 7
-  maxJumpHoldTime: 0.3
-  holdJumpForce: 7
+  maxJumpHoldTime: 0.2
+  holdJumpForce: 5
   fallGravity: 2
   releaseGravity: 2.5
   lowJumpGravity: 3
@@ -247,5 +280,26 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0.5}
-  m_Size: {x: 0.55263156, y: 1}
+  m_Size: {x: 0.5, y: 1}
   m_Direction: 0
+--- !u!114 &8868806644359803046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4701249800651638873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f835b3b8fdaee109c10de084ee3174, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ledgeCheckDistance: 0.1
+  ledgeClimbForce: 2
+  maxVerticalVelocity: 5
+  cooldown: 0.3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  playerController: {fileID: 878735311265153547}
+  ledgeCheckOrigin: {fileID: 7265524005033404970}
