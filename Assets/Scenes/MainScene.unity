@@ -306,9 +306,13 @@ MonoBehaviour:
   playerController: {fileID: 1951589833}
   groundedOffset: {x: 0, y: 1.7, z: -10}
   flyingOffset: {x: 0, y: 0.7, z: -10}
-  smoothSpeed: 0.2
+  smoothSpeed: 0.5
   offsetTransitionSpeed: 3
-  groundStateBufferTime: 0.15
+  groundApproachDistance: 0.5
+  fallingTransitionSpeed: 3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!4 &729875051 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7789979125672959843, guid: 0215aef37bcee521f9814a1a82856693, type: 3}

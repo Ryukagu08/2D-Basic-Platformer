@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     public bool isGrounded;
     private bool isJumping;
+    public bool IsFalling => !isGrounded && rb.linearVelocityY < 0;
     private float jumpTimeCounter;
     private float defaultGravity;
 
